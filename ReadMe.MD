@@ -1,6 +1,6 @@
 # Hyperbolic Helicoid
 
-Coded using three.js using the parametric geomery to initiate the hyperbolic function
+Coded using three.js using the parametric geometry to initiate the hyperbolic function
 
 ```js
 const Helicoid = (u, v, target) => {
@@ -16,6 +16,11 @@ const Helicoid = (u, v, target) => {
   target.set(x, y, z);
 };
 let geometry = new ParametricGeometry(Helicoid, 300, 300);
+```
+```
+<video width="320" height="240" controls>
+  <source src="https://github.com/Muiruriscode/3D-threejs-projects/edit/hyperbolic-helicoid/public/hyperbolic.mp4" type="video/mp4">
+</video>
 ```
 
 [![watch video](/public/hyperbolic.mp4)]
