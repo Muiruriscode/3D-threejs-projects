@@ -1,5 +1,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
+import * as SkeletonUtils from "three/examples/jsm/utils/SkeletonUtils";
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
@@ -8,15 +10,33 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.set(0, 10, 15);
+camera.position.set(0, 5, 7);
+
+const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+scene.add(ambientLight);
+const directionalLight = new THREE.DirectionalLight(0xffffff);
+scene.add(directionalLight);
+directionalLight.position.set(0, 10, 0);
 
 const renderer = new THREE.WebGLRenderer();
-renderer.setClearColor(0x111114);
+renderer.setClearColor(0x444444);
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
-const geometry = new THREE.PlaneGeometry(20, 20);
+
+const fbxfloader = new FBXLoader();
+
+let stag;
+let clips;
+fbxfloader.load("Punching.fbx", function (model) {
+  model.scale.set(0.01, 0.01, 0.01);
+  stag = model;
+
+  clips = model.animations;
+});
+
+const geometry = new THREE.PlaneGeometry(10, 10);
 const material = new THREE.MeshBasicMaterial({
   color: 0x444444,
   side: THREE.DoubleSide,
@@ -28,7 +48,7 @@ scene.add(mesh);
 
 mesh.name = "ground";
 
-const grid = new THREE.GridHelper(20, 20);
+const grid = new THREE.GridHelper(10, 10);
 scene.add(grid);
 
 const highlightSquare = new THREE.Mesh(
@@ -69,15 +89,8 @@ window.addEventListener("mousemove", function (e) {
   });
 });
 
-const sphereMesh = new THREE.Mesh(
-  new THREE.SphereGeometry(0.4, 4, 2),
-  new THREE.MeshBasicMaterial({
-    color: 0xffea000,
-    wireframe: true,
-  })
-);
-
 const objects = [];
+const mixers = [];
 
 function checkObjectExists() {
   const objectExists = objects.find(
@@ -94,28 +107,33 @@ window.addEventListener("mousedown", function (e) {
   if (!objectExists) {
     intersects.forEach(function (intersect) {
       if (intersect.object.name === "ground") {
-        const sphereClone = sphereMesh.clone();
-        sphereClone.position.copy(highlightSquare.position);
-        objects.push(sphereClone);
-        scene.add(sphereClone);
+        console.log("intersect");
+        const stagClone = SkeletonUtils.clone(stag);
+        stagClone.position.copy(highlightSquare.position);
+        objects.push(stagClone);
+
+        const mixer = new THREE.AnimationMixer(stagClone);
+        const clip = THREE.AnimationClip.findByName(clips, "mixamo.com");
+        const action = mixer.clipAction(clip);
+        action.play();
+        mixers.push(mixer);
+
+        scene.add(stagClone);
       }
     });
     highlightSquare.material.color.setHex(0xff0000);
   }
 });
 
-function rotateSphere(time) {
-  objects.forEach(function (object) {
-    object.rotation.x = time / 1000;
-    object.rotation.z = time / 1000;
-    object.position.y = 0.5 + 0.5 + Math.abs(Math.sin(time / 1000));
-  });
-}
-
+const clock = new THREE.Clock();
 function animate(time) {
   highlightSquare.material.opacity = 1 + Math.sin(time / 120);
+
+  const delta = clock.getDelta();
+  mixers.forEach(function (mixer) {
+    mixer.update(delta);
+  });
   controls.update();
-  rotateSphere(time);
   renderer.render(scene, camera);
 }
 renderer.setAnimationLoop(animate);
