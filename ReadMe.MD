@@ -17,8 +17,3 @@ const Helicoid = (u, v, target) => {
 };
 let geometry = new ParametricGeometry(Helicoid, 300, 300);
 ```
-<video width="320" height="240" controls>
-  <source src="https://github.com/Muiruriscode/3D-threejs-projects/edit/hyperbolic-helicoid/public/hyperbolic.mp4" type="video/mp4">
-</video>
-
-[![watch video](https://github.com/Muiruriscode/3D-threejs-projects/edit/hyperbolic-helicoid/public/hyperbolic.mp4)]
