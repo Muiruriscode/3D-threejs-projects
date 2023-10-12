@@ -1,6 +1,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+
 import { ParametricGeometry } from "three/examples/jsm/geometries/ParametricGeometry";
+
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
@@ -9,6 +11,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
+
 camera.position.set(0, 1, 3);
 
 const renderer = new THREE.WebGLRenderer();
@@ -122,12 +125,36 @@ function animate(playhead) {
     ball2.position.x = 0.5 * Math.sin(theta1);
     ball2.position.z = 0.5 * Math.cos(theta1);
   }
+=======
+camera.position.set(0, 5, 10);
+
+const renderer = new THREE.WebGLRenderer();
+renderer.setClearColor(0x111114);
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+const geometry = new THREE.PlaneGeometry(10, 10, 32, 32);
+const material = new THREE.MeshBasicMaterial({
+  color: 0x444444,
+  side: THREE.DoubleSide,
+});
+const mesh = new THREE.Mesh(geometry, material);
+mesh.rotation.x = -Math.PI / 2;
+scene.add(mesh);
+
+const grid = new THREE.GridHelper(10, 10);
+scene.add(grid);
+
+const clock = new THREE.Clock();
+function animate() {
+  window.requestAnimationFrame(animate);
   controls.update();
   renderer.render(scene, camera);
 }
 animate();
 
-window.addEventListener("resize", () => {
+window.addEventListener("resize", function () {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
