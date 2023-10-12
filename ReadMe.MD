@@ -1,6 +1,6 @@
 # Load a model with Animation
 
-Load an FBX model from [Mixamo](https://mixamo.com)
+Load an FBX model from [Mixamo](https://www.mixamo.com)
 
 ## Set Loading Page
 
