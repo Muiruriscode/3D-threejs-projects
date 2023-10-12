@@ -8,7 +8,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.set(0, 5, 10);
+camera.position.set(5, 2, 2);
 
 const renderer = new THREE.WebGLRenderer();
 renderer.setClearColor(0x111114);
@@ -16,17 +16,18 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
-const geometry = new THREE.PlaneGeometry(10, 10, 32, 32);
-const material = new THREE.MeshBasicMaterial({
-  color: 0x444444,
-  side: THREE.DoubleSide,
-});
-const mesh = new THREE.Mesh(geometry, material);
-mesh.rotation.x = -Math.PI / 2;
-scene.add(mesh);
+const geometry = new THREE.BufferGeometry();
+const particlesCount = 50000;
+const particlesArray = new Float32Array(particlesCount * 3);
 
-const grid = new THREE.GridHelper(10, 10);
-scene.add(grid);
+for (let i = 0; i < particlesCount * 3; i++) {
+  particlesArray[i] = Math.random() * 10;
+}
+geometry.setAttribute("position", new THREE.BufferAttribute(particlesArray, 3));
+
+const material = new THREE.PointsMaterial({ size: 0.005 });
+const mesh = new THREE.Points(geometry, material);
+scene.add(mesh);
 
 const clock = new THREE.Clock();
 function animate() {
